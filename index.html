@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="favicon.ico">
+
+    <title>Z-buffering</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="blog.css" rel="stylesheet">
+  </head>
+
+  <body>
+
+    <div class="blog-header">
+      <div class="container">
+        <h1 class="blog-title">Algoritmos de HSR</h1>
+       <!-- <p class="lead blog-description">An example blog template built with Bootstrap.</p> -->
+      </div>
+    </div>
+
+    <div class="container">
+
+      <div class="row">
+
+        <div class="col-sm-8 blog-main">
+
+          <div class="blog-post">
+            <h2 class="blog-post-title">Z-buffering</h2>
+            <p class="blog-post-meta">Septiembre 2017 by <a href="#">Nicolas Larrañaga</a></p>
+            <p></p>
+            <div align="center">
+              <img src="imagenes/z-buffer.png">
+            </img>
+          </div>
+          <p></p>
+          <p>En computación gráfica, el z-buffering es la parte de la memoria de
+            un adaptador de video encargada de gestionar las coordenadas de
+            profundidad de las imágenes en los gráficos en tres dimensiones (3-D),
+            normalmente calculados por hardware y algunas veces por software.</p>
+
+          <hr>
+          <p>El Z-buffering también se conoce como buffering de profundidad,
+             debido a que la profundidad del píxel generado (coordenada z) al
+             ser dibujado por una tarjeta gráfica 3D, se almacena en un búfer
+             de datos (el z-buffer).</p>
+          <p>La invención del concepto de z-buffer se le suele asignar a Edwin
+             Catmull. Realmente también Wolfgang Straßer describió esta idea en
+             su tesis doctoral de 1974 <sup>[2]</sup></p>
+          <p> Este búfer se suele distribuir como un array de 2 dimensiones (x-y)
+              con un elemento por cada pixel de la pantalla. Si algún otro objeto
+              de la escena se tiene que renderizar en el mismo pixel, la tarjeta
+              gráfica compara las dos profundidades y elige el más cercano al observador.
+              La profundidad elegida es entonces salvada en el z-buffer, reemplazando
+              a la antigua. Al final, el z-buffer permitirá a la tarjeta gráfica
+              reproducir correctamente la percepción de la profundidad normal:
+              los objetos cercanos ocultan a los más lejanos. Este efecto se
+              denomina Z-Culling. <sup>[1]</sup></p>
+          <h3>Características</h3>
+          <ul>
+          	<li>Uno de los algoritmos más simples y más usados</li>
+            <li>Fácilmente implementado a nivel de hardware</li>
+            <li>Trabaja basado en la imagen </li>
+          </ul>
+
+          <h3>Usos e implementaciones</h3>
+            <p>Es utilizado en casi todas las computadoras, ordenadores portátiles
+               y teléfonos móviles actuales para realizar gráficos en 3D, por ejemplo,
+               para juegos de ordenador. El buffer Z se implementa en los ICs de silicio
+               (circuitos integrados) dentro de estos ordenadores. El Z-buffer también
+               se utiliza (implementado como software en lugar de hardware) para
+               producir efectos especiales generados por ordenador para películas.</p>
+
+            <p>Además, los datos del buffer Z obtenidos desde un punto de luz permiten
+              la creación de sombras mediante la técnica de mapeo de sombras.<sup>[2]</sup></p>
+
+
+            <h3>Algoritmo Z-buffer</h3>
+            <p>
+               Este algoritmo está implementado en la mayoría de tarjetas gráficas
+               y forma parte de las técnicas utilizadas por las bibliotecas gráficas
+               (opengl, DirectX)<sup>[3]</sup>
+            </p>
+            <p>
+              En el algoritmo se crea una matriz que contiene los valores z de
+              la superficie visible para cada pixel representando la distancia en
+              z hacia el observador, esta matriz es llamada <b>z buffer</b>.
+              Los valores iniciales de esta matriz se establecen como infinito.
+              Una vez asignados los valores se procede a iterar sobre los polígonos
+              que compongan la escena, por cada uno de los cuales se iterará sobre
+              cada uno de sus pixeles; finalmente para cada pixel se calculará
+              la distancia en z hacia la camara. Una vez obtenida las posiciones
+              en x e y del pixel actualizaremos el z buffer bajo el siguiente criterio:
+
+              <ol>
+                <li>Si el valor en z para el pixel actual es menor que el valor
+                    del z buffer (i.e el objeto en cuestión se encuentra más
+                    cerca a la camara) reemplazamos el valor de ese pixel en el
+                    z buffer por el valor en el pixel del polígono actual.</li>
+                <li>En caso de que el valor en el z buffer sea menor (i.e el
+                    objeto se encuentra más lejos que otro objeto ya visto)
+                    no modificaremos la matriz.</li>
+              </ol>
+
+               <p>Suponga por ejemplo que tenemos la escena compuesta por las
+                  figuras de la siguiente imagen (izquierda).</p>
+            </p>
+            <div align="center">
+                    <img src="imagenes/matriz.png"/>
+            </div>
+			<div align="center">
+              <img src="imagenes/matriz1.png"/>
+      </div>
+          <p>
+            El algoritmo  funciona creando una matriz bidimensional donde cada
+            entrada
+          </p>
+          	<div align="center">
+              <img src="imagenes/matriz2.png"/>
+          </div>
+          <p>explicar</p>
+            <h4>Pseudocódigo</h4>
+            <pre><code>
+            clear frame buffer viewport to background color
+            clear depth buffer zbuffer to 1.0
+            for each polygon P
+              for each pixel (xndc, yndc) to which P projects
+                if zndc < zbuffer[xndc, yndc] then
+                  zbuffer[xndc, yndc] := zndc
+                  viewport[xndc, yndc] := color of P at (xndc, yndc)
+                endif
+              endfor
+            endfor
+            </code></pre>
+            <h4>Notas de implementación</h4>
+            <ul>
+            <li>Puede pintar el mismo pixel varias veces[3]</li>
+            <li>Se puede pintar el inverso de la escena</li>
+            <li>Requiere de una capacidad de memora bastante grande</li>
+            </ul>
+            <p>Debe tener en cuenta que necesita un buffer con el mismo ancho/altura que la ventana de visualización. La memoria real utilizada sería la anchura! altura! sizeof (real). En estos días, sizeof (real) es de alrededor de 4 a 8 bytes - más grande que un píxel RGB típico Por lo tanto, una implementación de z-buffer inmediatamente requiere al menos tres veces la visualización deseada</p>
+            <p>.</p>
+            <h3>Uso de Z-buffer en OpenGl</h3>
+            <h3>Comparación de algoritmos de HSR</h3>
+            <div align="center">
+              <img src="imagenes/compara.png"> </img>
+            </div>
+
+            <p></p>
+            <p>Donec ullamcorper nulla non metus auctor fringilla. Nulla vitae elit libero, a pharetra augue.</p>
+            <ol>
+              <li>Vestibulum id ligula porta felis euismod semper.</li>
+              <li>Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</li>
+              <li>Maecenas sed diam eget risus varius blandit sit amet non magna.</li>
+            </ol>
+            <p>Cras mattis consectetur purus sit amet fermentum. Sed posuere consectetur est at lobortis.</p>
+            <hr>
+            <h2>Referencias y Bibliografía</h2>
+            <p></p>
+            <ul>
+            	<li>[1] https://en.wikipedia.org/wiki/Z-buffering</li>
+                <li>[2] https://es.wikipedia.org/wiki/Z-buffer</li>
+                <li>[3] http://slideplayer.es/slide/4009190/</li>
+                <li>[4] http://myweb.lmu.edu/dondi/share/cg/hsr-v02.pdf</li>
+                <li>[5] http://webserver2.tecgraf.puc-rio.br/~abraposo/INF1366/2004/11_HiddenSurfaces.pdf</li>
+            </ul>
+          </div><!-- /.blog-post -->
+
+          <nav class="blog-pagination">
+            <a class="btn btn-outline-primary" href="#">Older</a>
+            <a class="btn btn-outline-secondary disabled" href="#">Newer</a>
+          </nav>
+
+        </div><!-- /.blog-main -->
+
+        <div class="col-sm-3 offset-sm-1 blog-sidebar">
+          <div class="sidebar-module sidebar-module-inset">
+            <h4>About</h4>
+            <p>Etiam porta <em>sem malesuada magna</em> mollis euismod. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur.</p>
+          </div>
+          <div class="sidebar-module">
+            <h4>Elsewhere</h4>
+            <ol class="list-unstyled">
+              <li><a href="#">GitHub</a></li>
+              <li><a href="#">Twitter</a></li>
+              <li><a href="#">Facebook</a></li>
+            </ol>
+          </div>
+        </div><!-- /.blog-sidebar -->
+
+      </div><!-- /.row -->
+
+    </div><!-- /.container -->
+
+    <footer class="blog-footer">
+      <p>Blog template built for <a href="https://getbootstrap.com">Bootstrap</a> by <a href="https://twitter.com/mdo">@mdo</a>.</p>
+      <p>
+        <a href="#">Back to top</a>
+      </p>
+    </footer>
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script>window.jQuery || document.write('<script src="../vendor/jquery.min.js"><\/script>')</script>
+    <script src="../vendor/popper.min.js"></script>
+    <script src="bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../../../../assets/js/ie10-viewport-bug-workaround.js"></script>
+  </body>
+</html>
